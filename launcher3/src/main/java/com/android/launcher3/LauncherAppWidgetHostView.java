@@ -25,12 +25,10 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.RemoteViews;
 
-import com.android.launcher3.DragLayer.TouchCompleteListener;
-
 /**
  * {@inheritDoc}
  */
-public class LauncherAppWidgetHostView extends AppWidgetHostView implements TouchCompleteListener {
+public class LauncherAppWidgetHostView extends AppWidgetHostView implements DragLayer.TouchCompleteListener {
 
     LayoutInflater mInflater;
 

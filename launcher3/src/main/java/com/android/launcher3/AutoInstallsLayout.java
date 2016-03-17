@@ -36,7 +36,6 @@ import android.util.Pair;
 import android.util.Patterns;
 
 import com.android.launcher3.LauncherProvider.SqlArguments;
-import com.android.launcher3.LauncherSettings.Favorites;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -105,7 +104,7 @@ public class AutoInstallsLayout {
     private static final String ATTR_VALUE = "value";
 
     private static final String HOTSEAT_CONTAINER_NAME =
-            Favorites.containerToString(Favorites.CONTAINER_HOTSEAT);
+            LauncherSettings.Favorites.containerToString(LauncherSettings.Favorites.CONTAINER_HOTSEAT);
 
     private static final String ACTION_APPWIDGET_DEFAULT_WORKSPACE_CONFIGURE =
             "com.android.launcher.action.APPWIDGET_DEFAULT_WORKSPACE_CONFIGURE";
@@ -184,12 +183,12 @@ public class AutoInstallsLayout {
      */
     protected void parseContainerAndScreen(XmlResourceParser parser, long[] out) {
         if (HOTSEAT_CONTAINER_NAME.equals(getAttributeValue(parser, ATTR_CONTAINER))) {
-            out[0] = Favorites.CONTAINER_HOTSEAT;
+            out[0] = LauncherSettings.Favorites.CONTAINER_HOTSEAT;
             // Hack: hotseat items are stored using screen ids
             long rank = Long.parseLong(getAttributeValue(parser, ATTR_RANK));
             out[1] = (rank < mHotseatAllAppsRank) ? rank : (rank + 1);
         } else {
-            out[0] = Favorites.CONTAINER_DESKTOP;
+            out[0] = LauncherSettings.Favorites.CONTAINER_DESKTOP;
             out[1] = Long.parseLong(getAttributeValue(parser, ATTR_SCREEN));
         }
     }
@@ -207,10 +206,10 @@ public class AutoInstallsLayout {
         final long container = mTemp[0];
         final long screenId = mTemp[1];
 
-        mValues.put(Favorites.CONTAINER, container);
-        mValues.put(Favorites.SCREEN, screenId);
-        mValues.put(Favorites.CELLX, getAttributeValue(parser, ATTR_X));
-        mValues.put(Favorites.CELLY, getAttributeValue(parser, ATTR_Y));
+        mValues.put(LauncherSettings.Favorites.CONTAINER, container);
+        mValues.put(LauncherSettings.Favorites.SCREEN, screenId);
+        mValues.put(LauncherSettings.Favorites.CELLX, getAttributeValue(parser, ATTR_X));
+        mValues.put(LauncherSettings.Favorites.CELLY, getAttributeValue(parser, ATTR_Y));
 
         TagParser tagParser = tagParserMap.get(parser.getName());
         if (tagParser == null) {
@@ -221,7 +220,7 @@ public class AutoInstallsLayout {
         if (newElementId >= 0) {
             // Keep track of the set of screens which need to be added to the db.
             if (!screenIds.contains(screenId) &&
-                    container == Favorites.CONTAINER_DESKTOP) {
+                    container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
                 screenIds.add(screenId);
             }
             return 1;
@@ -231,12 +230,12 @@ public class AutoInstallsLayout {
 
     protected long addShortcut(String title, Intent intent, int type) {
         long id = mCallback.generateNewItemId();
-        mValues.put(Favorites.INTENT, intent.toUri(0));
-        mValues.put(Favorites.TITLE, title);
-        mValues.put(Favorites.ITEM_TYPE, type);
-        mValues.put(Favorites.SPANX, 1);
-        mValues.put(Favorites.SPANY, 1);
-        mValues.put(Favorites._ID, id);
+        mValues.put(LauncherSettings.Favorites.INTENT, intent.toUri(0));
+        mValues.put(LauncherSettings.Favorites.TITLE, title);
+        mValues.put(LauncherSettings.Favorites.ITEM_TYPE, type);
+        mValues.put(LauncherSettings.Favorites.SPANX, 1);
+        mValues.put(LauncherSettings.Favorites.SPANY, 1);
+        mValues.put(LauncherSettings.Favorites._ID, id);
         if (mCallback.insertAndCheck(mDb, mValues) < 0) {
             return -1;
         } else {
@@ -301,7 +300,7 @@ public class AutoInstallsLayout {
                                 Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 
                     return addShortcut(info.loadLabel(mPackageManager).toString(),
-                            intent, Favorites.ITEM_TYPE_APPLICATION);
+                            intent, LauncherSettings.Favorites.ITEM_TYPE_APPLICATION);
                 } catch (PackageManager.NameNotFoundException e) {
                     if (LOGD) Log.w(TAG, "Unable to add favorite: " + packageName + "/" + className, e);
                 }
@@ -334,14 +333,14 @@ public class AutoInstallsLayout {
                 return -1;
             }
 
-            mValues.put(Favorites.RESTORED, ShortcutInfo.FLAG_AUTOINTALL_ICON);
+            mValues.put(LauncherSettings.Favorites.RESTORED, ShortcutInfo.FLAG_AUTOINTALL_ICON);
             final Intent intent = new Intent(Intent.ACTION_MAIN, null)
                 .addCategory(Intent.CATEGORY_LAUNCHER)
                 .setComponent(new ComponentName(packageName, className))
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                         Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             return addShortcut(mContext.getString(R.string.package_state_unknown), intent,
-                    Favorites.ITEM_TYPE_APPLICATION);
+                    LauncherSettings.Favorites.ITEM_TYPE_APPLICATION);
         }
     }
 
@@ -378,14 +377,14 @@ public class AutoInstallsLayout {
             }
 
             ItemInfo.writeBitmap(mValues, Utilities.createIconBitmap(icon, mContext));
-            mValues.put(Favorites.ICON_TYPE, Favorites.ICON_TYPE_RESOURCE);
-            mValues.put(Favorites.ICON_PACKAGE, mIconRes.getResourcePackageName(iconId));
-            mValues.put(Favorites.ICON_RESOURCE, mIconRes.getResourceName(iconId));
+            mValues.put(LauncherSettings.Favorites.ICON_TYPE, LauncherSettings.Favorites.ICON_TYPE_RESOURCE);
+            mValues.put(LauncherSettings.Favorites.ICON_PACKAGE, mIconRes.getResourcePackageName(iconId));
+            mValues.put(LauncherSettings.Favorites.ICON_RESOURCE, mIconRes.getResourceName(iconId));
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                         Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             return addShortcut(mSourceRes.getString(titleResId),
-                    intent, Favorites.ITEM_TYPE_SHORTCUT);
+                    intent, LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT);
         }
 
         protected Intent parseIntent(XmlResourceParser parser) {
@@ -429,8 +428,8 @@ public class AutoInstallsLayout {
                 }
             }
 
-            mValues.put(Favorites.SPANX, getAttributeValue(parser, ATTR_SPAN_X));
-            mValues.put(Favorites.SPANY, getAttributeValue(parser, ATTR_SPAN_Y));
+            mValues.put(LauncherSettings.Favorites.SPANX, getAttributeValue(parser, ATTR_SPAN_X));
+            mValues.put(LauncherSettings.Favorites.SPANY, getAttributeValue(parser, ATTR_SPAN_Y));
 
             // Read the extras
             Bundle extras = new Bundle();
@@ -465,10 +464,10 @@ public class AutoInstallsLayout {
                     return -1;
                 }
 
-                mValues.put(Favorites.ITEM_TYPE, Favorites.ITEM_TYPE_APPWIDGET);
-                mValues.put(Favorites.APPWIDGET_ID, appWidgetId);
-                mValues.put(Favorites.APPWIDGET_PROVIDER, cn.flattenToString());
-                mValues.put(Favorites._ID, mCallback.generateNewItemId());
+                mValues.put(LauncherSettings.Favorites.ITEM_TYPE, LauncherSettings.Favorites.ITEM_TYPE_APPWIDGET);
+                mValues.put(LauncherSettings.Favorites.APPWIDGET_ID, appWidgetId);
+                mValues.put(LauncherSettings.Favorites.APPWIDGET_PROVIDER, cn.flattenToString());
+                mValues.put(LauncherSettings.Favorites._ID, mCallback.generateNewItemId());
                 insertedId = mCallback.insertAndCheck(mDb, mValues);
                 if (insertedId < 0) {
                     mAppWidgetHost.deleteAppWidgetId(appWidgetId);
@@ -512,11 +511,11 @@ public class AutoInstallsLayout {
                 title = mContext.getResources().getString(R.string.folder_name);
             }
 
-            mValues.put(Favorites.TITLE, title);
-            mValues.put(Favorites.ITEM_TYPE, Favorites.ITEM_TYPE_FOLDER);
-            mValues.put(Favorites.SPANX, 1);
-            mValues.put(Favorites.SPANY, 1);
-            mValues.put(Favorites._ID, mCallback.generateNewItemId());
+            mValues.put(LauncherSettings.Favorites.TITLE, title);
+            mValues.put(LauncherSettings.Favorites.ITEM_TYPE, LauncherSettings.Favorites.ITEM_TYPE_FOLDER);
+            mValues.put(LauncherSettings.Favorites.SPANX, 1);
+            mValues.put(LauncherSettings.Favorites.SPANY, 1);
+            mValues.put(LauncherSettings.Favorites._ID, mCallback.generateNewItemId());
             long folderId = mCallback.insertAndCheck(mDb, mValues);
             if (folderId < 0) {
                 if (LOGD) Log.e(TAG, "Unable to add folder");
@@ -534,7 +533,7 @@ public class AutoInstallsLayout {
                     continue;
                 }
                 mValues.clear();
-                mValues.put(Favorites.CONTAINER, folderId);
+                mValues.put(LauncherSettings.Favorites.CONTAINER, folderId);
 
                 TagParser tagParser = mFolderElements.get(parser.getName());
                 if (tagParser != null) {
@@ -554,7 +553,7 @@ public class AutoInstallsLayout {
             // failed to add, and less than 2 were actually added
             if (folderItems.size() < 2) {
                 // Delete the folder
-                Uri uri = Favorites.getContentUri(folderId, false);
+                Uri uri = LauncherSettings.Favorites.getContentUri(folderId, false);
                 SqlArguments args = new SqlArguments(uri, null, null);
                 mDb.delete(args.table, args.where, args.args);
                 addedId = -1;
@@ -563,14 +562,14 @@ public class AutoInstallsLayout {
                 // would have been.
                 if (folderItems.size() == 1) {
                     final ContentValues childValues = new ContentValues();
-                    copyInteger(myValues, childValues, Favorites.CONTAINER);
-                    copyInteger(myValues, childValues, Favorites.SCREEN);
-                    copyInteger(myValues, childValues, Favorites.CELLX);
-                    copyInteger(myValues, childValues, Favorites.CELLY);
+                    copyInteger(myValues, childValues, LauncherSettings.Favorites.CONTAINER);
+                    copyInteger(myValues, childValues, LauncherSettings.Favorites.SCREEN);
+                    copyInteger(myValues, childValues, LauncherSettings.Favorites.CELLX);
+                    copyInteger(myValues, childValues, LauncherSettings.Favorites.CELLY);
 
                     addedId = folderItems.get(0);
                     mDb.update(LauncherProvider.TABLE_FAVORITES, childValues,
-                            Favorites._ID + "=" + addedId, null);
+                            LauncherSettings.Favorites._ID + "=" + addedId, null);
                 }
             }
             return addedId;

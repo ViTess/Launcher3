@@ -97,13 +97,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.android.launcher3.DropTarget.DragObject;
-import com.android.launcher3.PagedView.PageSwitchListener;
 import com.android.launcher3.compat.AppWidgetManagerCompat;
 import com.android.launcher3.compat.LauncherActivityInfoCompat;
 import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.PackageInstallerCompat;
-import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
 
@@ -132,7 +129,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Launcher extends Activity
         implements View.OnClickListener, OnLongClickListener, LauncherModel.Callbacks,
-                   View.OnTouchListener, PageSwitchListener, LauncherProviderChangeListener {
+                   View.OnTouchListener, PagedView.PageSwitchListener, LauncherProviderChangeListener {
     static final String TAG = "Launcher";
     static final boolean LOGD = false;
 
@@ -1526,7 +1523,7 @@ public class Launcher extends Activity
                     true, null,null)) {
                 return;
             }
-            DragObject dragObject = new DragObject();
+            DropTarget.DragObject dragObject = new DropTarget.DragObject();
             dragObject.dragInfo = info;
             if (mWorkspace.addToExistingFolderIfNecessary(view, layout, cellXY, 0, dragObject,
                     true)) {
@@ -4695,7 +4692,7 @@ public class Launcher extends Activity
      * Implementation of the method from LauncherModel.Callbacks.
      */
     @Override
-    public void updatePackageState(ArrayList<PackageInstallInfo> installInfo) {
+    public void updatePackageState(ArrayList<PackageInstallerCompat.PackageInstallInfo> installInfo) {
         if (mWorkspace != null) {
             mWorkspace.updatePackageState(installInfo);
         }

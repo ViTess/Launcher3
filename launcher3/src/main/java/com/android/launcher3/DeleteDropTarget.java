@@ -32,7 +32,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.UserManager;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -211,7 +210,7 @@ public class DeleteDropTarget extends ButtonDropTarget {
 
         mActive = isVisible;
         resetHoverColor();
-        ((ViewGroup) getParent()).setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        ((ViewGroup) getParent()).setVisibility(isVisible ? VISIBLE : GONE);
         if (isVisible && getText().length() > 0) {
             setText(useUninstallLabel ? R.string.delete_target_uninstall_label
                 : R.string.delete_target_label);

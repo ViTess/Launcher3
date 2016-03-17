@@ -19,9 +19,6 @@ package com.android.launcher3;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -77,9 +74,9 @@ public class AppInfo extends ItemInfo {
      * Must not hold the Context.
      */
     public AppInfo(Context context, LauncherActivityInfoCompat info, UserHandleCompat user,
-            IconCache iconCache, HashMap<Object, CharSequence> labelCache) {
+                   IconCache iconCache, HashMap<Object, CharSequence> labelCache) {
         this.componentName = info.getComponentName();
-        this.container = ItemInfo.NO_ID;
+        this.container = NO_ID;
 
         flags = initFlags(info);
         firstInstallTime = info.getFirstInstallTime();

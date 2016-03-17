@@ -40,7 +40,7 @@ public class PackageInstallerCompatV16 extends PackageInstallerCompat {
     private static final String KEY_STATE = "state";
 
     private static final String PREFS =
-            "com.android.launcher3.compat.PackageInstallerCompatV16.queue";
+            "PackageInstallerCompatV16.queue";
 
     protected final SharedPreferences mPrefs;
 

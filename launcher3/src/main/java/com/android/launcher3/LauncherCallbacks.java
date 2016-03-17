@@ -89,7 +89,7 @@ public interface LauncherCallbacks {
 
     /**
      * Returning true will immediately result in a call to {@link #setLauncherOverlayView(ViewGroup,
-     * com.android.launcher3.Launcher.LauncherOverlayCallbacks)}.
+     * Launcher.LauncherOverlayCallbacks)}.
      *
      * @return true if this launcher extension will provide an overlay
      */

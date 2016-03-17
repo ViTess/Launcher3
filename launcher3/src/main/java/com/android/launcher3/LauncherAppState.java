@@ -33,9 +33,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+
 import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.PackageInstallerCompat;
-import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -283,7 +284,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
         return getInstance().mBuildInfo.isDogfoodBuild();
     }
 
-    public void setPackageState(ArrayList<PackageInstallInfo> installInfo) {
+    public void setPackageState(ArrayList<PackageInstallerCompat.PackageInstallInfo> installInfo) {
         mModel.setPackageState(installInfo);
     }
 

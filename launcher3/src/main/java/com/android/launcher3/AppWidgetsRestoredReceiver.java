@@ -12,8 +12,6 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.android.launcher3.LauncherSettings.Favorites;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,11 +57,11 @@ public class AppWidgetsRestoredReceiver extends BroadcastReceiver {
 
             String[] widgetIdParams = new String[] { Integer.toString(oldWidgetIds[i]) };
 
-            int result = cr.update(Favorites.CONTENT_URI, values,
+            int result = cr.update(LauncherSettings.Favorites.CONTENT_URI, values,
                     "appWidgetId=? and (restored & 1) = 1", widgetIdParams);
             if (result == 0) {
-                Cursor cursor = cr.query(Favorites.CONTENT_URI,
-                        new String[] {Favorites.APPWIDGET_ID},
+                Cursor cursor = cr.query(LauncherSettings.Favorites.CONTENT_URI,
+                        new String[] {LauncherSettings.Favorites.APPWIDGET_ID},
                         "appWidgetId=?", widgetIdParams, null);
                 try {
                     if (!cursor.moveToFirst()) {

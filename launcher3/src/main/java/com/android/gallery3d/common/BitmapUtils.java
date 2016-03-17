@@ -23,7 +23,6 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Build;
-import android.util.FloatMath;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;

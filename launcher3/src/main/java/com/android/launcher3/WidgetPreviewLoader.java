@@ -29,6 +29,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
+
 import com.android.launcher3.compat.AppWidgetManagerCompat;
 
 import java.io.ByteArrayOutputStream;

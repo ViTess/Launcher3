@@ -45,8 +45,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.android.launcher3.AutoInstallsLayout.LayoutParserCallback;
-import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.config.ProviderConfig;
@@ -376,7 +374,7 @@ public class LauncherProvider extends ContentProvider {
         mOpenHelper = new DatabaseHelper(getContext());
     }
 
-    private static class DatabaseHelper extends SQLiteOpenHelper implements LayoutParserCallback {
+    private static class DatabaseHelper extends SQLiteOpenHelper implements AutoInstallsLayout.LayoutParserCallback {
         private final Context mContext;
         private final AppWidgetHost mAppWidgetHost;
         private long mMaxItemId = -1;
@@ -463,7 +461,7 @@ public class LauncherProvider extends ContentProvider {
                 ContentValuesCallback permuteScreensCb = new ContentValuesCallback() {
                     public void onRow(ContentValues values) {
                         int container = values.getAsInteger(LauncherSettings.Favorites.CONTAINER);
-                        if (container == Favorites.CONTAINER_DESKTOP) {
+                        if (container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
                             int screen = values.getAsInteger(LauncherSettings.Favorites.SCREEN);
                             screen = (int) upgradeLauncherDb_permuteScreens(screen);
                             values.put(LauncherSettings.Favorites.SCREEN, screen);
@@ -905,8 +903,8 @@ public class LauncherProvider extends ContentProvider {
         }
 
         private boolean updateContactsShortcuts(SQLiteDatabase db) {
-            final String selectWhere = buildOrWhereString(Favorites.ITEM_TYPE,
-                    new int[] { Favorites.ITEM_TYPE_SHORTCUT });
+            final String selectWhere = buildOrWhereString(LauncherSettings.Favorites.ITEM_TYPE,
+                    new int[] { LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT });
 
             Cursor c = null;
             final String actionQuickContact = "com.android.contacts.action.QUICK_CONTACT";
@@ -914,14 +912,14 @@ public class LauncherProvider extends ContentProvider {
             try {
                 // Select and iterate through each matching widget
                 c = db.query(TABLE_FAVORITES,
-                        new String[] { Favorites._ID, Favorites.INTENT },
+                        new String[] { LauncherSettings.Favorites._ID, LauncherSettings.Favorites.INTENT },
                         selectWhere, null, null, null, null);
                 if (c == null) return false;
 
                 if (LOGD) Log.d(TAG, "found upgrade cursor count=" + c.getCount());
 
-                final int idIndex = c.getColumnIndex(Favorites._ID);
-                final int intentIndex = c.getColumnIndex(Favorites.INTENT);
+                final int idIndex = c.getColumnIndex(LauncherSettings.Favorites._ID);
+                final int intentIndex = c.getColumnIndex(LauncherSettings.Favorites.INTENT);
 
                 while (c.moveToNext()) {
                     long favoriteId = c.getLong(idIndex);
@@ -958,7 +956,7 @@ public class LauncherProvider extends ContentProvider {
                                     values.put(LauncherSettings.Favorites.INTENT,
                                             newIntent.toUri(0));
 
-                                    String updateWhere = Favorites._ID + "=" + favoriteId;
+                                    String updateWhere = LauncherSettings.Favorites._ID + "=" + favoriteId;
                                     db.update(TABLE_FAVORITES, values, updateWhere, null);
                                 }
                             }
@@ -996,10 +994,10 @@ public class LauncherProvider extends ContentProvider {
                         + "SET icon=? WHERE _id=?");
 
                 c = db.rawQuery("SELECT _id, icon FROM favorites WHERE iconType=" +
-                        Favorites.ICON_TYPE_BITMAP, null);
+                        LauncherSettings.Favorites.ICON_TYPE_BITMAP, null);
 
-                final int idIndex = c.getColumnIndexOrThrow(Favorites._ID);
-                final int iconIndex = c.getColumnIndexOrThrow(Favorites.ICON);
+                final int idIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites._ID);
+                final int iconIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.ICON);
 
                 while (c.moveToNext()) {
                     long id = c.getLong(idIndex);
@@ -1142,19 +1140,20 @@ public class LauncherProvider extends ContentProvider {
         private void convertWidgets(SQLiteDatabase db) {
             final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
             final int[] bindSources = new int[] {
-                    Favorites.ITEM_TYPE_WIDGET_CLOCK,
-                    Favorites.ITEM_TYPE_WIDGET_PHOTO_FRAME,
-                    Favorites.ITEM_TYPE_WIDGET_SEARCH,
+                    LauncherSettings.Favorites.ITEM_TYPE_WIDGET_CLOCK,
+                    LauncherSettings.Favorites.ITEM_TYPE_WIDGET_PHOTO_FRAME,
+                    LauncherSettings.Favorites.ITEM_TYPE_WIDGET_SEARCH,
             };
 
-            final String selectWhere = buildOrWhereString(Favorites.ITEM_TYPE, bindSources);
+            final String selectWhere = buildOrWhereString(LauncherSettings.Favorites.ITEM_TYPE, bindSources);
 
             Cursor c = null;
 
             db.beginTransaction();
             try {
                 // Select and iterate through each matching widget
-                c = db.query(TABLE_FAVORITES, new String[] { Favorites._ID, Favorites.ITEM_TYPE },
+                c = db.query(TABLE_FAVORITES, new String[] { LauncherSettings.Favorites._ID,
+                        LauncherSettings.Favorites.ITEM_TYPE },
                         selectWhere, null, null, null, null);
 
                 if (LOGD) Log.d(TAG, "found upgrade cursor count=" + c.getCount());
@@ -1173,11 +1172,11 @@ public class LauncherProvider extends ContentProvider {
                                     + " for favoriteId=" + favoriteId);
                         }
                         values.clear();
-                        values.put(Favorites.ITEM_TYPE, Favorites.ITEM_TYPE_APPWIDGET);
-                        values.put(Favorites.APPWIDGET_ID, appWidgetId);
+                        values.put(LauncherSettings.Favorites.ITEM_TYPE, LauncherSettings.Favorites.ITEM_TYPE_APPWIDGET);
+                        values.put(LauncherSettings.Favorites.APPWIDGET_ID, appWidgetId);
 
                         // Original widgets might not have valid spans when upgrading
-                        if (favoriteType == Favorites.ITEM_TYPE_WIDGET_SEARCH) {
+                        if (favoriteType == LauncherSettings.Favorites.ITEM_TYPE_WIDGET_SEARCH) {
                             values.put(LauncherSettings.Favorites.SPANX, 4);
                             values.put(LauncherSettings.Favorites.SPANY, 1);
                         } else {
@@ -1185,20 +1184,20 @@ public class LauncherProvider extends ContentProvider {
                             values.put(LauncherSettings.Favorites.SPANY, 2);
                         }
 
-                        String updateWhere = Favorites._ID + "=" + favoriteId;
+                        String updateWhere = LauncherSettings.Favorites._ID + "=" + favoriteId;
                         db.update(TABLE_FAVORITES, values, updateWhere, null);
 
-                        if (favoriteType == Favorites.ITEM_TYPE_WIDGET_CLOCK) {
+                        if (favoriteType == LauncherSettings.Favorites.ITEM_TYPE_WIDGET_CLOCK) {
                             // TODO: check return value
                             appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId,
                                     new ComponentName("com.android.alarmclock",
                                     "com.android.alarmclock.AnalogAppWidgetProvider"));
-                        } else if (favoriteType == Favorites.ITEM_TYPE_WIDGET_PHOTO_FRAME) {
+                        } else if (favoriteType == LauncherSettings.Favorites.ITEM_TYPE_WIDGET_PHOTO_FRAME) {
                             // TODO: check return value
                             appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId,
                                     new ComponentName("com.android.camera",
                                     "com.android.camera.PhotoAppWidgetProvider"));
-                        } else if (favoriteType == Favorites.ITEM_TYPE_WIDGET_SEARCH) {
+                        } else if (favoriteType == LauncherSettings.Favorites.ITEM_TYPE_WIDGET_SEARCH) {
                             // TODO: check return value
                             appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId,
                                     getSearchWidgetProvider());
@@ -1237,7 +1236,7 @@ public class LauncherProvider extends ContentProvider {
 
                 final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
                 ComponentName cn = ComponentName.unflattenFromString(
-                        values.getAsString(Favorites.APPWIDGET_PROVIDER));
+                        values.getAsString(LauncherSettings.Favorites.APPWIDGET_PROVIDER));
 
                 if (cn != null) {
                     try {
@@ -1406,9 +1405,9 @@ public class LauncherProvider extends ContentProvider {
 
                         while (c.moveToNext()) {
                             final int itemType = c.getInt(itemTypeIndex);
-                            if (itemType != Favorites.ITEM_TYPE_APPLICATION
-                                    && itemType != Favorites.ITEM_TYPE_SHORTCUT
-                                    && itemType != Favorites.ITEM_TYPE_FOLDER) {
+                            if (itemType != LauncherSettings.Favorites.ITEM_TYPE_APPLICATION
+                                    && itemType != LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT
+                                    && itemType != LauncherSettings.Favorites.ITEM_TYPE_FOLDER) {
                                 continue;
                             }
 
@@ -1443,7 +1442,7 @@ public class LauncherProvider extends ContentProvider {
                                 + "/" + screen
                                 + "): " + intentStr, true);
 
-                            if (itemType != Favorites.ITEM_TYPE_FOLDER) {
+                            if (itemType != LauncherSettings.Favorites.ITEM_TYPE_FOLDER) {
 
                                 final Intent intent;
                                 final ComponentName cn;
@@ -1524,7 +1523,7 @@ public class LauncherProvider extends ContentProvider {
 
                             values.put(LauncherSettings.Favorites.CONTAINER, container);
 
-                            if (itemType != Favorites.ITEM_TYPE_FOLDER) {
+                            if (itemType != LauncherSettings.Favorites.ITEM_TYPE_FOLDER) {
                                 shortcuts.add(values);
                             } else {
                                 folders.add(values);
@@ -1552,7 +1551,7 @@ public class LauncherProvider extends ContentProvider {
                             if (hotseatX >= hotseatWidth) {
                                 // no room for you in the hotseat? it's off to the desktop with you
                                 values.put(LauncherSettings.Favorites.CONTAINER,
-                                           Favorites.CONTAINER_DESKTOP);
+                                           LauncherSettings.Favorites.CONTAINER_DESKTOP);
                             }
                         }
 

@@ -140,7 +140,7 @@ class DumbBitmapRegionDecoder implements SimpleBitmapRegionDecoder {
 }
 
 /**
- * A {@link com.android.photos.views.TiledImageRenderer.TileSource} using
+ * A {@link TiledImageRenderer.TileSource} using
  * {@link BitmapRegionDecoder} to wrap a local file
  */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)

@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.content.Intent.ShortcutIconResource;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.LauncherApps.Callback;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
@@ -56,7 +55,6 @@ import com.android.launcher3.compat.AppWidgetManagerCompat;
 import com.android.launcher3.compat.LauncherActivityInfoCompat;
 import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.PackageInstallerCompat;
-import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.compat.UserManagerCompat;
 
@@ -207,7 +205,7 @@ public class LauncherModel extends BroadcastReceiver
         public void bindShortcutsChanged(ArrayList<ShortcutInfo> updated,
                 ArrayList<ShortcutInfo> removed, UserHandleCompat user);
         public void bindWidgetsRestored(ArrayList<LauncherAppWidgetInfo> widgets);
-        public void updatePackageState(ArrayList<PackageInstallInfo> installInfo);
+        public void updatePackageState(ArrayList<PackageInstallerCompat.PackageInstallInfo> installInfo);
         public void updatePackageBadge(String packageName);
         public void bindComponentsRemoved(ArrayList<String> packageNames,
                         ArrayList<AppInfo> appInfos, UserHandleCompat user, int reason);
@@ -345,7 +343,7 @@ public class LauncherModel extends BroadcastReceiver
         return null;
     }
 
-    public void setPackageState(final ArrayList<PackageInstallInfo> installInfo) {
+    public void setPackageState(final ArrayList<PackageInstallerCompat.PackageInstallInfo> installInfo) {
         // Process the updated package state
         Runnable r = new Runnable() {
             public void run() {

@@ -240,9 +240,9 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
             BitmapRegionTileSource source = new BitmapRegionTileSource(a, bitmapSource);
             CropView v = a.getCropView();
             v.setTileSource(source, null);
-            Point wallpaperSize = WallpaperCropActivity.getDefaultWallpaperSize(
+            Point wallpaperSize = getDefaultWallpaperSize(
                     a.getResources(), a.getWindowManager());
-            RectF crop = WallpaperCropActivity.getMaxCropRect(
+            RectF crop = getMaxCropRect(
                     source.getImageWidth(), source.getImageHeight(),
                     wallpaperSize.x, wallpaperSize.y, false);
             v.setScale(wallpaperSize.x / crop.width());
@@ -553,7 +553,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
                             info.onSave(WallpaperPickerActivity.this);
                         } else {
                             // no tile was selected, so we just finish the activity and go back
-                            setResult(Activity.RESULT_OK);
+                            setResult(RESULT_OK);
                             finish();
                         }
                     }
@@ -812,7 +812,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
         rotatedBounds[0] = Math.abs(rotatedBounds[0]);
         rotatedBounds[1] = Math.abs(rotatedBounds[1]);
 
-        RectF cropRect = WallpaperCropActivity.getMaxCropRect(
+        RectF cropRect = getMaxCropRect(
                 (int) rotatedBounds[0], (int) rotatedBounds[1], width, height, leftAligned);
         cropTask.setCropBounds(cropRect);
 
@@ -839,7 +839,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
         new AsyncTask<Void, Bitmap, Bitmap>() {
             protected Bitmap doInBackground(Void...args) {
                 try {
-                    int rotation = WallpaperCropActivity.getRotationFromExif(context, uri);
+                    int rotation = getRotationFromExif(context, uri);
                     return createThumbnail(defaultSize, context, uri, null, null, 0, rotation, false);
                 } catch (SecurityException securityException) {
                     if (isDestroyed()) {
@@ -984,7 +984,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
         try {
             f.createNewFile();
             FileOutputStream thumbFileStream =
-                    openFileOutput(f.getName(), Context.MODE_PRIVATE);
+                    openFileOutput(f.getName(), MODE_PRIVATE);
             b.compress(Bitmap.CompressFormat.JPEG, 95, thumbFileStream);
             thumbFileStream.close();
             return true;
@@ -1024,7 +1024,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
         } else {
             Resources res = getResources();
             Point defaultThumbSize = getDefaultThumbnailSize(res);
-            int rotation = WallpaperCropActivity.getRotationFromExif(res, resId);
+            int rotation = getRotationFromExif(res, resId);
             thumb = createThumbnail(
                     defaultThumbSize, this, null, null, sysRes, resId, rotation, false);
             if (thumb != null) {

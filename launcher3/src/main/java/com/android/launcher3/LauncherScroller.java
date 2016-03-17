@@ -20,7 +20,6 @@ import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Build;
-import android.util.FloatMath;
 import android.view.ViewConfiguration;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;

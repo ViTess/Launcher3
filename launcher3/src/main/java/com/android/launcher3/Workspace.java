@@ -31,10 +31,7 @@ import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -77,8 +74,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -357,7 +352,7 @@ public class Workspace extends SmoothPagedView
 
         // Disable multitouch across the workspace/all apps/customize tray
         setMotionEventSplittingEnabled(true);
-        setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
     }
 
     @Override
@@ -492,7 +487,7 @@ public class Workspace extends SmoothPagedView
 
     @Override
     protected int getScrollMode() {
-        return SmoothPagedView.X_LARGE_MODE;
+        return X_LARGE_MODE;
     }
 
     @Override
@@ -1846,7 +1841,7 @@ public class Workspace extends SmoothPagedView
     @Override
     public int getDescendantFocusability() {
         if (workspaceInModalState()) {
-            return ViewGroup.FOCUS_BLOCK_DESCENDANTS;
+            return FOCUS_BLOCK_DESCENDANTS;
         }
         return super.getDescendantFocusability();
     }
@@ -2411,8 +2406,8 @@ public class Workspace extends SmoothPagedView
 
             // For animation optimations, we may need to provide the Launcher transition
             // with a set of views on which to force build layers in certain scenarios.
-            hotseat.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-            overviewPanel.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            hotseat.setLayerType(LAYER_TYPE_HARDWARE, null);
+            overviewPanel.setLayerType(LAYER_TYPE_HARDWARE, null);
             if (layerViews != null) {
                 layerViews.add(hotseat);
                 layerViews.add(overviewPanel);
@@ -2436,7 +2431,7 @@ public class Workspace extends SmoothPagedView
                 Animator searchBarAlpha = new LauncherViewPropertyAnimator(searchBar)
                     .alpha(finalSearchBarAlpha).withLayer();
                 searchBarAlpha.addListener(new AlphaUpdateListener(searchBar));
-                searchBar.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                searchBar.setLayerType(LAYER_TYPE_HARDWARE, null);
                 if (layerViews != null) {
                     layerViews.add(searchBar);
                 }
@@ -4692,7 +4687,7 @@ public class Workspace extends SmoothPagedView
     }
 
     public void disableShortcutsByPackageName(final ArrayList<String> packages,
-            final UserHandleCompat user, final int reason) {
+                                              final UserHandleCompat user, final int reason) {
         final HashSet<String> packageNames = new HashSet<String>();
         packageNames.addAll(packages);
 

@@ -23,7 +23,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.launcher3.compat.UserHandleCompat;
@@ -112,7 +111,7 @@ public class InfoDropTarget extends ButtonDropTarget {
         mActive = isVisible;
         mDrawable.resetTransition();
         setTextColor(mOriginalTextColor);
-        ((ViewGroup) getParent()).setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        ((ViewGroup) getParent()).setVisibility(isVisible ? VISIBLE : GONE);
     }
 
     @Override
