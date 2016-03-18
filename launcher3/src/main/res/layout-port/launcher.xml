@@ -15,6 +15,9 @@
 -->
 
 <!-- Full screen view projects under the status bar and contains the background -->
+<!-- 这里是手机竖屏时的主界面布局 -->
+<!-- workspace_bg：这张9patch图用于屏幕顶部和底部的阴影 -->
+<!-- fitsSystemWindows：设置适配状态栏高度 -->
 <com.android.launcher3.LauncherRootView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
@@ -28,30 +31,39 @@
     <com.android.launcher3.DragLayer
         android:id="@+id/drag_layer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
+
+        <!-- FocusIndicatorView：用于显示通过键盘选中图标的效果 -->
 
         <com.android.launcher3.FocusIndicatorView
             android:id="@+id/focus_indicator"
             android:layout_width="52dp"
-            android:layout_height="52dp" />
+            android:layout_height="52dp"
+            />
 
+        <!--  -->
         <!-- The workspace contains 5 screens of cells -->
         <com.android.launcher3.Workspace
             android:id="@+id/workspace"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             launcher:defaultScreen="@integer/config_workspaceDefaultScreen"
-            launcher:pageIndicator="@+id/page_indicator">
+            launcher:pageIndicator="@+id/page_indicator"
+            >
         </com.android.launcher3.Workspace>
 
-        <include layout="@layout/hotseat"
+        <include
             android:id="@+id/hotseat"
+            layout="@layout/hotseat"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            />
 
-        <include layout="@layout/overview_panel"
+        <include
             android:id="@+id/overview_panel"
-            android:visibility="gone" />
+            layout="@layout/overview_panel"
+            android:visibility="gone"/>
 
         <!-- Keep these behind the workspace so that they are not visible when
              we go into AllApps -->
@@ -60,17 +72,18 @@
             layout="@layout/page_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"/>
 
         <include
             android:id="@+id/search_drop_target_bar"
-            layout="@layout/search_drop_target_bar" />
+            layout="@layout/search_drop_target_bar"/>
 
-        <include layout="@layout/apps_customize_pane"
+        <include
             android:id="@+id/apps_customize_pane"
+            layout="@layout/apps_customize_pane"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="invisible" />
+            android:visibility="invisible"/>
     </com.android.launcher3.DragLayer>
 
     <ViewStub
@@ -78,5 +91,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:inflatedId="@+id/launcher_overlay"
-        android:layout="@layout/launcher_overlay" />
+        android:layout="@layout/launcher_overlay"/>
 </com.android.launcher3.LauncherRootView>

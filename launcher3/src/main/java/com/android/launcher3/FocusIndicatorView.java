@@ -25,6 +25,11 @@ import android.util.Pair;
 import android.view.View;
 import android.view.ViewParent;
 
+/**
+ * 桌面图标被选中时的效果View
+ * 这里的效果需要用键盘实现，即键盘按上下左右选择图标时，被选中的图标所呈现的形态
+ * 由onFocusChange里执行动画效果即可得知
+ */
 public class FocusIndicatorView extends View implements View.OnFocusChangeListener {
 
     // It can be any number >0. The view is resized using scaleX and scaleY.
@@ -94,8 +99,10 @@ public class FocusIndicatorView extends View implements View.OnFocusChangeListen
             nextState.scaleY = v.getScaleY() * v.getHeight() / indicatorHeight;
 
             getLocationRelativeToParentPagedView(v, mTargetViewPos);
-            nextState.x = mTargetViewPos[0] - mIndicatorPos[0] - (1 - nextState.scaleX) * indicatorWidth / 2;
-            nextState.y = mTargetViewPos[1] - mIndicatorPos[1] - (1 - nextState.scaleY) * indicatorHeight / 2;
+            nextState.x = mTargetViewPos[0] - mIndicatorPos[0] - (1 - nextState.scaleX) *
+                    indicatorWidth / 2;
+            nextState.y = mTargetViewPos[1] - mIndicatorPos[1] - (1 - nextState.scaleY) *
+                    indicatorHeight / 2;
 
             if (getAlpha() > MIN_VISIBLE_ALPHA) {
                 mTargetState = nextState;
