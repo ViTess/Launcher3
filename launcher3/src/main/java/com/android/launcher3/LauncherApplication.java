@@ -22,13 +22,19 @@ public class LauncherApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //初始化LauncherAppState
         LauncherAppState.setApplicationContext(this);
         LauncherAppState.getInstance();
     }
 
+    /**
+     * 当终止应用程序对象时调用，不保证一定被调用
+     * 即当被系统内核为了分配内存而终止该app时，这个方法不会被调用
+     */
     @Override
     public void onTerminate() {
         super.onTerminate();
+        //释放LauncherAppState中的资源
         LauncherAppState.getInstance().onTerminate();
     }
 }

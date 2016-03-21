@@ -45,8 +45,15 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * 从名字上分析这是一个应用widget预览的加载器
+ */
 public class WidgetPreviewLoader {
 
+    /**
+     * 一个基于ThreadLocal的软引用类
+     * @param <T>
+     */
     private static abstract class SoftReferenceThreadLocal<T> {
         private ThreadLocal<SoftReference<T>> mThreadLocal;
         public SoftReferenceThreadLocal() {
@@ -119,11 +126,13 @@ public class WidgetPreviewLoader {
     private static final float WIDGET_PREVIEW_ICON_PADDING_PERCENTAGE = 0.25f;
     private static final HashSet<String> sInvalidPackages = new HashSet<String>();
 
+    //快捷方式图标的缓存
     // Used for drawing shortcut previews
     private final BitmapCache mCachedShortcutPreviewBitmap = new BitmapCache();
     private final PaintCache mCachedShortcutPreviewPaint = new PaintCache();
     private final CanvasCache mCachedShortcutPreviewCanvas = new CanvasCache();
 
+    //widget的各种缓存
     // Used for drawing widget previews
     private final CanvasCache mCachedAppWidgetPreviewCanvas = new CanvasCache();
     private final RectCache mCachedAppWidgetPreviewSrcRect = new RectCache();
@@ -150,6 +159,9 @@ public class WidgetPreviewLoader {
 
     private CacheDb mDb;
 
+    /**
+     * 初始化主线程对应的线程池
+     */
     private final MainThreadExecutor mMainThreadExecutor = new MainThreadExecutor();
 
     public WidgetPreviewLoader(Context context) {

@@ -43,6 +43,9 @@ import java.util.Collections;
 import java.util.Comparator;
 
 
+/**
+ * 理解为内部类，DeviceProfile的队列类？包装类？未理解
+ */
 class DeviceProfileQuery {
     DeviceProfile profile;
     float widthDps;
@@ -59,40 +62,44 @@ class DeviceProfileQuery {
     }
 }
 
+/**
+ * 通过名字理解为设备描述
+ */
 public class DeviceProfile {
     public static interface DeviceProfileCallbacks {
         public void onAvailableSizeChanged(DeviceProfile grid);
     }
 
-    String name;
-    float minWidthDps;
-    float minHeightDps;
-    float numRows;
-    float numColumns;
-    float numHotseatIcons;
-    float iconSize;
-    private float iconTextSize;
-    private int iconDrawablePaddingOriginalPx;
-    private float hotseatIconSize;
+    String name;//设备名？
+    float minWidthDps;//最小宽度(dp)？
+    float minHeightDps;//最小高度(dp)？
+    float numRows;//行数（行数不是整数？？）
+    float numColumns;//列数
+    float numHotseatIcons;//Hotseat翻译为热座，即手机底部的快捷方式导航条，这里的变量意思为导航条中的数量？
+    float iconSize;//图标大小..因为图标一般是正方形的所以就一个变量？
+    private float iconTextSize;//图标对应的标题大小
+    private int iconDrawablePaddingOriginalPx;//貌似是指图标的padding，单位为px
+    private float hotseatIconSize;//导航条中图标的大小
 
-    int defaultLayoutId;
+    int defaultLayoutId;//未知？
 
-    boolean isLandscape;
-    boolean isTablet;
-    boolean isLargeTablet;
-    boolean isLayoutRtl;
-    boolean transposeLayoutWithOrientation;
+    boolean isLandscape;//是否为横屏，竖屏英文为PORTRAIT
+    boolean isTablet;//是否为平板
+    boolean isLargeTablet;//是否为大屏幕平板？
+    boolean isLayoutRtl;//是否布局为从右到左
+    boolean transposeLayoutWithOrientation;//从名字理解为是否根据屏幕转向而转置屏幕？？
 
-    int desiredWorkspaceLeftRightMarginPx;
-    int edgeMarginPx;
+    int desiredWorkspaceLeftRightMarginPx;//workespace左右边所需要的margin(px)？
+    int edgeMarginPx;//边缘的margin(px)？
     Rect defaultWidgetPadding;
 
-    int widthPx;
-    int heightPx;
-    int availableWidthPx;
-    int availableHeightPx;
+    int widthPx;//猜测是屏幕宽度
+    int heightPx;//猜测是屏幕高度
+    int availableWidthPx;//可用的屏幕宽度
+    int availableHeightPx;//可用高度
     int defaultPageSpacingPx;
 
+    //这边的overview mode不理解，可能是边缘形状
     int overviewModeMinIconZoneHeightPx;
     int overviewModeMaxIconZoneHeightPx;
     int overviewModeBarItemWidthPx;

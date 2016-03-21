@@ -18,6 +18,9 @@ package com.android.launcher3;
 
 import android.graphics.Rect;
 
+/**
+ * 一个接口，暂时未知有何用
+ */
 public interface Insettable {
 
     void setInsets(Rect insets);

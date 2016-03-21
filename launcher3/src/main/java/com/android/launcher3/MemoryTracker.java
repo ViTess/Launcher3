@@ -27,6 +27,9 @@ import android.util.LongSparseArray;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 内存监控服务
+ */
 public class MemoryTracker extends Service {
     public static final String TAG = MemoryTracker.class.getSimpleName();
     public static final String ACTION_START_TRACKING = "com.android.launcher3.action.START_TRACKING";
@@ -37,13 +40,17 @@ public class MemoryTracker extends Service {
     private static final int MSG_STOP = 2;
     private static final int MSG_UPDATE = 3;
 
+    /**
+     * 静态内部类，记录进程内存信息的bean
+     */
     public static class ProcessMemInfo {
-        public int pid;
-        public String name;
-        public long startTime;
-        public long currentPss, currentUss;
-        public long[] pss = new long[256];
-        public long[] uss = new long[256];
+        public int pid;//进程id
+        public String name;//进程名
+        public long startTime;//开始时间..?
+        public long currentPss, currentUss;//当前的pss和uss..?
+        //pss理解为uss+比例分配共享库中占用的内存
+        public long[] pss = new long[256];//Proportional Set Size 实际使用的物理内存（比例分配共享库占用的内存）
+        public long[] uss = new long[256];//Unique Set Size 进程独自占用的物理内存（不包含共享库占用的内存）
             //= new Meminfo[(int) (30 * 60 / (UPDATE_RATE / 1000))]; // 30 minutes
         public long max = 1;
         public int head = 0;
@@ -57,13 +64,18 @@ public class MemoryTracker extends Service {
         }
     };
     public final LongSparseArray<ProcessMemInfo> mData = new LongSparseArray<ProcessMemInfo>();
+    //这里保存了Long和int类型的pid，为什么？
     public final ArrayList<Long> mPids = new ArrayList<Long>();
-    private int[] mPidsArray = new int[0];
-    private final Object mLock = new Object();
+    private int[] mPidsArray = new int[0];//暂时不理解这里设置一个0长度数组的意义
+
+    private final Object mLock = new Object();//线程同步锁用的
 
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message m) {
+            //注意这里多处的removeMessages(MSG_UPDATE)
+            //是为了避免消息队列中出现多次的MSG_UPDATE
+            //确保MSG_UPDATE不被多次调用
             switch (m.what) {
                 case MSG_START:
                     mHandler.removeMessages(MSG_UPDATE);
@@ -83,7 +95,14 @@ public class MemoryTracker extends Service {
 
     ActivityManager mAm;
 
+    /**
+     * 这个静态方法用于开启当前这个内存监测的服务
+     * @param context
+     * @param name
+     */
     public static void startTrackingMe(Context context, String name) {
+        //首次startService会调用service的onCreate方法
+        //多次调用startService会调用onStartCommand()
         context.startService(new Intent(context, MemoryTracker.class)
                 .setAction(MemoryTracker.ACTION_START_TRACKING)
                 .putExtra("pid", android.os.Process.myPid())
@@ -91,6 +110,11 @@ public class MemoryTracker extends Service {
         );
     }
 
+    /**
+     * 根据进程id获取其内存消息
+     * @param pid
+     * @return
+     */
     public ProcessMemInfo getMemInfo(int pid) {
         return mData.get(pid);
     }
@@ -99,6 +123,12 @@ public class MemoryTracker extends Service {
         return mPidsArray;
     }
 
+    /**
+     * 就是将对应的进程信息放进list和数组里
+     * @param pid
+     * @param name
+     * @param start
+     */
     public void startTrackingProcess(int pid, String name, long start) {
         synchronized (mLock) {
             final Long lpid = new Long(pid);
@@ -124,6 +154,10 @@ public class MemoryTracker extends Service {
         Log.v(TAG, sb.toString());
     }
 
+    /**
+     * 最核心的方法，根据pid获取内存数据
+     * 然而用到了synchronized不知道是为什么
+     */
     void update() {
         synchronized (mLock) {
             Debug.MemoryInfo[] dinfos = mAm.getProcessMemoryInfo(mPidsArray);
@@ -156,6 +190,9 @@ public class MemoryTracker extends Service {
         }
     }
 
+    /**
+     * 这里是把跟当前包名相同的service和process的信息都提取出来记录到内部的list和数组里
+     */
     @Override
     public void onCreate() {
         mAm = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);

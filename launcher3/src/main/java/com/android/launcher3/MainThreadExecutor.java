@@ -24,6 +24,9 @@ import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * <p>一个与主线程相对应的线程池？</p>
+ * <p>内部就是用到Handler和Looper，如果当前是在主线程中，则直接run线程</p>
+ * <p>否则就用handler去post线程</p>
  * An executor service that executes its tasks on the main thread.
  *
  * Shutting down this executor is not supported.

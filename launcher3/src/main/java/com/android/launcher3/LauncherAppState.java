@@ -40,6 +40,9 @@ import com.android.launcher3.compat.PackageInstallerCompat;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+/**
+ * 以单例模式被调用，主要是初始化许多对象和记录一些状态值
+ */
 public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
     private static final String TAG = "LauncherAppState";
 
@@ -64,6 +67,10 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
     private DynamicGrid mDynamicGrid;
 
+    /**
+     * 这里获取单例模式是未有实例的先创建再返回
+     * @return
+     */
     public static LauncherAppState getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new LauncherAppState();
@@ -71,6 +78,10 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
         return INSTANCE;
     }
 
+    /**
+     * 这里获取的单例是直接返回，应该是避免单例已经被回收再次创建的意思？
+     * @return
+     */
     public static LauncherAppState getInstanceNoCreate() {
         return INSTANCE;
     }
@@ -87,18 +98,22 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
     }
 
     private LauncherAppState() {
+        //创建实例之前要先设置好ApplicationContext
         if (sContext == null) {
             throw new IllegalStateException("LauncherAppState inited before app context set");
         }
 
         Log.v(Launcher.TAG, "LauncherAppState inited");
 
+        //这里应该是测试用的内存监测，因为debug_memory_enabled为false所以不会被调用
         if (sContext.getResources().getBoolean(R.bool.debug_memory_enabled)) {
             MemoryTracker.startTrackingMe(sContext, "L");
         }
 
+        //获取是否为大屏幕，sw720dp以上为大
         // set sIsScreenXLarge and mScreenDensity *before* creating icon cache
         mIsScreenLarge = isScreenLarge(sContext.getResources());
+        //获取像素值
         mScreenDensity = sContext.getResources().getDisplayMetrics().density;
 
         recreateWidgetPreviewDb();
@@ -241,6 +256,11 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
         return mIsScreenLarge;
     }
 
+    /**
+     * 根据屏幕大小获取是否是大屏幕，sw720dp以上为大
+     * @param res
+     * @return
+     */
     // Need a version that doesn't require an instance of LauncherAppState for the wallpaper picker
     public static boolean isScreenLarge(Resources res) {
         return res.getBoolean(R.bool.is_large_tablet);
