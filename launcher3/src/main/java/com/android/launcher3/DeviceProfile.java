@@ -140,9 +140,23 @@ public class DeviceProfile {
 
     private ArrayList<DeviceProfileCallbacks> mCallbacks = new ArrayList<DeviceProfileCallbacks>();
 
+    /**
+     * 针对单个设备创建的实例
+     * @param n 名字
+     * @param w 屏幕宽度？
+     * @param h 屏幕高度？
+     * @param r 行
+     * @param c 列
+     * @param is icon大小
+     * @param its icon的标题大小
+     * @param hs hotseat上的icon数量
+     * @param his hotseat上的icon大小
+     * @param dlId 这个defaultLayoutId应该是默认布局
+     */
     DeviceProfile(String n, float w, float h, float r, float c,
                   float is, float its, float hs, float his, int dlId) {
         // Ensure that we have an odd number of hotseat items (since we need to place all apps)
+        //热键数目必须是奇数，因为中间是应用抽屉的入口
         if (!LauncherAppState.isDisableAllApps() && hs % 2 == 0) {
             throw new RuntimeException("All Device Profiles must have an odd number of hotseat spaces");
         }
@@ -162,6 +176,18 @@ public class DeviceProfile {
     DeviceProfile() {
     }
 
+    /**
+     * 将所有的DeviceProfile..??
+     * @param context
+     * @param profiles
+     * @param minWidth
+     * @param minHeight
+     * @param wPx
+     * @param hPx
+     * @param awPx
+     * @param ahPx
+     * @param res
+     */
     DeviceProfile(Context context,
                   ArrayList<DeviceProfile> profiles,
                   float minWidth, float minHeight,
@@ -202,33 +228,45 @@ public class DeviceProfile {
 
         // Find the closes profile given the width/height
         for (DeviceProfile p : profiles) {
+            //为什么要把value设置为0？
             points.add(new DeviceProfileQuery(p, 0f));
         }
+        //拿出最接近的DeviceProfile
         DeviceProfile closestProfile = findClosestDeviceProfile(minWidth, minHeight, points);
 
+        //把最接近的DeviceProfile的行数设置上
         // Snap to the closest row count
         numRows = closestProfile.numRows;
 
+        //把最接近的DeviceProfile的列数设置上
         // Snap to the closest column count
         numColumns = closestProfile.numColumns;
 
+        //底部导航栏icon数量范围是3\5\7
+        //所以hotseatAllAppsRank的范围是1\2\3
         // Snap to the closest hotseat size
         numHotseatIcons = closestProfile.numHotseatIcons;
         hotseatAllAppsRank = (int) (numHotseatIcons / 2);
 
+        //设置默认布局
         // Snap to the closest default layout id
         defaultLayoutId = closestProfile.defaultLayoutId;
 
+        //然后刚才value为0的DeviceProfileQuery的List就清空了
+        //改为重新插入value为对应的DeviceProfile的icon大小的DeviceProfileQuery
         // Interpolate the icon size
         points.clear();
         for (DeviceProfile p : profiles) {
             points.add(new DeviceProfileQuery(p, p.iconSize));
         }
+        //根据knn算法，得出一个与DeviceProfile最相近的iconSize，为了匹配不同屏幕大小
         iconSize = invDistWeightedInterpolate(minWidth, minHeight, points);
 
+        //这里这个allapp是指所有app??将上面计算出来的iconSize从dp换成px
         // AllApps uses the original non-scaled icon size
         allAppsIconSizePx = DynamicGrid.pxFromDp(iconSize, dm);
 
+        //这里是计算iconTextSize，算法同上
         // Interpolate the icon text size
         points.clear();
         for (DeviceProfile p : profiles) {
@@ -240,6 +278,7 @@ public class DeviceProfile {
         // AllApps uses the original non-scaled icon text size
         allAppsIconTextSizePx = DynamicGrid.pxFromDp(iconTextSize, dm);
 
+        //同上
         // Interpolate the hotseat icon size
         points.clear();
         for (DeviceProfile p : profiles) {
@@ -248,12 +287,15 @@ public class DeviceProfile {
         // Hotseat
         hotseatIconSize = invDistWeightedInterpolate(minWidth, minHeight, points);
 
+        //这里是指，允许第三方自定义新的桌面图标、大小等，具体看Partner类里就知道了
+        //在里面通过获取第三方应用中设定的数值重新设定iconsizes之类的
         // If the partner customization apk contains any grid overrides, apply them
         applyPartnerDeviceProfileOverrides(context, dm);
 
+        //下面这三个方法都是计算确定好所有图标等需要的大小（单位为px）
         // Calculate the remaining vars
         updateFromConfiguration(context, res, wPx, hPx, awPx, ahPx);
-        updateAvailableDimensions(context);
+        updateAvailableDimensions(context);//这里在updateFromConfiguration的最后已经被调用过一次了
         computeAllAppsButtonSize(context);
     }
 
@@ -285,6 +327,7 @@ public class DeviceProfile {
     }
 
     /**
+     * 确定所有应用程序按钮的准确视觉足迹，考虑到缩放和绘制的内部填充。
      * Determine the exact visual footprint of the all apps button, taking into account scaling
      * and internal padding of the drawable.
      */
@@ -336,12 +379,27 @@ public class DeviceProfile {
         // the height is the smallest height (either with the nav bar at the bottom or to the
         // side) and otherwise, the height is simply the largest possible height for a portrait
         // device.
+
+        //这边贴一组数据
+        //i9300的：       x         y
+        //getSize：      720       1280
+        //smallest：     720        675
+        //largest：      1280      1280
+        //
+        //某平板：         x         y
+        //getSize：      1366       723
+        //smallest：     768        723
+        //largest：      1366       723
+        //
+        //根据数据理解，这里getSize拿到的就是当前屏幕的长宽（px）
+        //而smallest是指在最小情况下的长宽，这里的最小情况包括了软键盘的占用等情况
         Point size = new Point();
         Point smallestSize = new Point();
         Point largestSize = new Point();
-        display.getSize(size);
-        display.getCurrentSizeRange(smallestSize, largestSize);
+        display.getSize(size);//获取显示区域以像素为单位的宽和高
+        display.getCurrentSizeRange(smallestSize, largestSize);//这里是拿取一个屏幕所在的区间的最小最大值
         availableWidthPx = size.x;
+        //这里是指最小值就是竖屏，而最大值是横屏？
         if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             availableHeightPx = smallestSize.y;
         } else {
@@ -350,6 +408,7 @@ public class DeviceProfile {
 
         // Check to see if the icons fit in the new available height.  If not, then we need to
         // shrink the icon size.
+        //这边就是按照scale缩放对应的尺寸，使其改为px
         float scale = 1f;
         int drawablePadding = iconDrawablePaddingOriginalPx;
         updateIconSize(1f, drawablePadding, resources, dm);
@@ -361,8 +420,10 @@ public class DeviceProfile {
             scale = maxHeight / usedHeight;
             drawablePadding = 0;
         }
+        //然后再根据得出的缩放比再算一次……所以为什么要算两次？
         updateIconSize(scale, drawablePadding, resources, dm);
 
+        //所有数据算完可以刷新图形了……？那不就被调用了两次
         // Make the callbacks
         for (DeviceProfileCallbacks cb : mCallbacks) {
             cb.onAvailableSizeChanged(this);
@@ -427,6 +488,15 @@ public class DeviceProfile {
         }
     }
 
+    /**
+     * 通过这个方法获取部分设置，以及给某些变量赋值
+     * @param context
+     * @param resources
+     * @param wPx
+     * @param hPx
+     * @param awPx
+     * @param ahPx
+     */
     void updateFromConfiguration(Context context, Resources resources, int wPx, int hPx,
                                  int awPx, int ahPx) {
         Configuration configuration = resources.getConfiguration();
@@ -446,31 +516,58 @@ public class DeviceProfile {
         updateAvailableDimensions(context);
     }
 
+    /**
+     * 勾股定力求两点间的距离
+     * @param p0
+     * @param p1
+     * @return
+     */
     private float dist(PointF p0, PointF p1) {
         return (float) Math.sqrt((p1.x - p0.x)*(p1.x-p0.x) +
                 (p1.y-p0.y)*(p1.y-p0.y));
     }
 
+    /**
+     * 计算权重
+     * @param a
+     * @param b
+     * @param pow
+     * @return
+     */
     private float weight(PointF a, PointF b,
                         float pow) {
         float d = dist(a, b);
         if (d == 0f) {
-            return Float.POSITIVE_INFINITY;
+            return Float.POSITIVE_INFINITY;//正无穷大
         }
+        //返回点与点的距离的pow次方之1..
         return (float) (1f / Math.pow(d, pow));
     }
 
-    /** Returns the closest device profile given the width and height and a list of profiles */
+    /**
+     * 通过按照点与点距离最小来排序后，拿出第一个的DeviceProfile出来，就是最短距离的
+     * Returns the closest device profile given the width and height and a list of profiles
+     * @param width
+     * @param height
+     * @param points
+     * @return*/
     private DeviceProfile findClosestDeviceProfile(float width, float height,
                                                    ArrayList<DeviceProfileQuery> points) {
         return findClosestDeviceProfiles(width, height, points).get(0).profile;
     }
 
-    /** Returns the closest device profiles ordered by closeness to the specified width and height */
+    /**
+     * 返回跟目标宽、高最接近的DeviceProfileQuery
+     * <p>就是重新排列了DeviceProfileQuery，按照点与点的距离
+     * <p>Returns the closest device profiles ordered by closeness to the specified width and height
+     * @param width
+     * @param height
+     * @param points
+     * @return*/
     private ArrayList<DeviceProfileQuery> findClosestDeviceProfiles(float width, float height,
                                                    ArrayList<DeviceProfileQuery> points) {
         final PointF xy = new PointF(width, height);
-
+        //这里的DeviceProfileQuery的dimens是DeviceProfile的minWidthDps和minHeightDps所组成的点
         // Sort the profiles by their closeness to the dimensions
         ArrayList<DeviceProfileQuery> pointsByNearness = points;
         Collections.sort(pointsByNearness, new Comparator<DeviceProfileQuery>() {
@@ -482,28 +579,42 @@ public class DeviceProfile {
         return pointsByNearness;
     }
 
+    /**
+     * 这个方法用到了K Nearest Neighbor算法，即近邻取样
+     * @param width
+     * @param height
+     * @param points
+     * @return
+     */
     private float invDistWeightedInterpolate(float width, float height,
                 ArrayList<DeviceProfileQuery> points) {
         float sum = 0;
         float weights = 0;
-        float pow = 5;
-        float kNearestNeighbors = 3;
+        float pow = 5;//5次方，将距离大的值的影响减少
+        float kNearestNeighbors = 3;//表示离自己最近的3个数据样本
         final PointF xy = new PointF(width, height);
 
+        //这里还是拿出根据点与点距离排序好的List
         ArrayList<DeviceProfileQuery> pointsByNearness = findClosestDeviceProfiles(width, height,
                 points);
 
         for (int i = 0; i < pointsByNearness.size(); ++i) {
             DeviceProfileQuery p = pointsByNearness.get(i);
+            //这里的循环是i<3时就计算，只算0、1、2这三个
             if (i < kNearestNeighbors) {
                 float w = weight(xy, p.dimens, pow);
+                //返回无限大意味这当前的width和height这个长宽的屏幕
+                //与当前的DeviceProfile完全一致，就可以直接使用这套DeviceProfile的方案了
                 if (w == Float.POSITIVE_INFINITY) {
+                    //如果计算的值是无限大，则直接返回当前的DeviceProfileQuery的value（这里的value根据设置的不同而不同）
                     return p.value;
                 }
                 weights += w;
             }
         }
 
+        //取前三个值，并根据其权重计算最终值
+        //根据权重计算可知，数值倾向于距离短的DeviceProfile的value
         for (int i = 0; i < pointsByNearness.size(); ++i) {
             DeviceProfileQuery p = pointsByNearness.get(i);
             if (i < kNearestNeighbors) {

@@ -69,6 +69,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
     /**
      * 这里获取单例模式是未有实例的先创建再返回
+     *
      * @return
      */
     public static LauncherAppState getInstance() {
@@ -80,6 +81,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
     /**
      * 这里获取的单例是直接返回，应该是避免单例已经被回收再次创建的意思？
+     *
      * @return
      */
     public static LauncherAppState getInstanceNoCreate() {
@@ -92,7 +94,8 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
     public static void setApplicationContext(Context context) {
         if (sContext != null) {
-            Log.w(Launcher.TAG, "setApplicationContext called twice! old=" + sContext + " new=" + context);
+            Log.w(Launcher.TAG, "setApplicationContext called twice! old=" + sContext + " new=" +
+                    context);
         }
         sContext = context.getApplicationContext();
     }
@@ -258,6 +261,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
     /**
      * 根据屏幕大小获取是否是大屏幕，sw720dp以上为大
+     *
      * @param res
      * @return
      */
@@ -268,7 +272,7 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
     public static boolean isScreenLandscape(Context context) {
         return context.getResources().getConfiguration().orientation ==
-            Configuration.ORIENTATION_LANDSCAPE;
+                Configuration.ORIENTATION_LANDSCAPE;
     }
 
     public float getScreenDensity() {
@@ -296,6 +300,8 @@ public class LauncherAppState implements DeviceProfile.DeviceProfileCallbacks {
 
     public static boolean isDisableAllApps() {
         // Returns false on non-dogfood builds.
+        //return false，则是双层结构
+        //return true，则是单层结构，应用图标全部在首页上
         return getInstance().mBuildInfo.isDogfoodBuild() &&
                 Utilities.isPropertyEnabled(Launcher.DISABLE_ALL_APPS_PROPERTY);
     }
